@@ -8,13 +8,13 @@
   --background-end-rgb: 255, 255, 255;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
-}
+/*@media (prefers-color-scheme: dark) {*/
+/*  :root {*/
+/*    --foreground-rgb: 255, 255, 255;*/
+/*    --background-start-rgb: 0, 0, 0;*/
+/*    --background-end-rgb: 0, 0, 0;*/
+/*  }*/
+/*}*/
 
 body {
   color: rgb(var(--foreground-rgb));
@@ -25,3 +25,43 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+
+table, th, td, colgroup{
+    @apply border-collapse border border-slate-500
+}
+
+th, td{
+    @apply px-2
+}
+
+th {
+    /*insert header color here. use @apply color-class to use tailwind classes*/
+}
+
+colgroup[span] {
+    @apply border-2
+}
+
+.redDot {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: red;
+}
+
+.limeDot {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: lime;
+}
+
+.popupDiv{
+    position: absolute;
+    border: solid black;
+    background-color: white;
+    opacity: 0.85;
+}
+
