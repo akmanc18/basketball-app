@@ -80,26 +80,17 @@ export default function Court(props: Props) {
                 shotDot && 
                 (
                     <div>
-                        <div style=
+                        <div className="redDot" style=
                         {{
-                            position: "absolute",
                             left: shotDot.xPos,
                             top: shotDot.yPos,
-                            width: "10px",
-                            height: "10px",
-                            borderRadius: "50%",
-                            backgroundColor: "red",
                         }} />
 
-                        <div style=
+                        <div className="p-3 popupDiv" style=
                         {{
-                            position: "absolute",
                             left: shotDot.xPos + 15,
                             top: shotDot.yPos + 5,
-                            border: "solid black",
-                            backgroundColor: "white",
-                            opacity: 0.85,
-                        }} className='p-3'>
+                        }} >
                             <div className='grid grid-cols-1 grid-rows-2'>
                                 { shotResult != "blocked" &&
                                     ( <div className='grid grid-cols-3 grid-rows-1 text-center gap-3'>
@@ -179,26 +170,17 @@ export default function Court(props: Props) {
                 turnoverDot && 
                 (
                     <div>
-                        <div style=
+                        <div className="limeDot" style=
                         {{
-                            position: "absolute",
                             left: turnoverDot.xPos,
                             top: turnoverDot.yPos,
-                            width: "10px",
-                            height: "10px",
-                            borderRadius: "50%",
-                            backgroundColor: "lime",
                         }} />
 
-                        <div style=
+                        <div className="p-3 popupDiv" style=
                         {{
-                            position: "absolute",
                             left: turnoverDot.xPos + 15,
                             top: turnoverDot.yPos + 5,
-                            border: "solid black",
-                            backgroundColor: "white",
-                            opacity: 0.85,
-                        }} className='p-3'>
+                        }} >
                             <div className='grid grid-cols-1 grid-rows-2'>
                                 <div className='grid grid-cols-2 grid-rows-1 text-center gap-3'>
                                     <label>
