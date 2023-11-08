@@ -1,6 +1,7 @@
 "use client"
 
 import supabase from '@/util/db';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react'
 
 export default function Login()
@@ -8,11 +9,17 @@ export default function Login()
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
     
+    const router = useRouter();
+    
     const loginClick = async () =>
     {
         if(email && password)
         {
-            await supabase.auth.signInWithPassword({email: email, password: password})
+            const {data, error} = await supabase.auth.signInWithPassword({email: email, password: password});
+            if (!error)
+            {
+                router.push("/insert");
+            }
         }
     };
     
@@ -21,10 +28,14 @@ export default function Login()
         if(email && password)
         {
             console.log("Signing up")
-            const {data, error} =  await supabase.auth.signUp({email: email, password: password})
+            const {data, error} = await supabase.auth.signUp({email: email, password: password})
             console.log(data)
             console.log("------------------------------------------")
             console.log(error)
+            if (!error)
+            {
+                router.push("/insert");
+            }
         }
     };
 

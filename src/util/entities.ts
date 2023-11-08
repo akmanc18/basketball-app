@@ -58,3 +58,4 @@ export interface ShotData
 
 
 export type ShotResult = "hit" | "missed" | "blocked";
+export type OtherPlaysType = "ball loss" | "steal" | "turnover" | "rebound";
