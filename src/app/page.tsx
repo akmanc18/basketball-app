@@ -3,11 +3,13 @@
 import supabase from '@/util/db';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react'
+import {debounce} from "next/dist/server/utils";
 
 export default function Login()
 {
     const [email, setEmail] = useState<string>("");
     const [password, setPassword] = useState<string>("");
+    const [error, setError] = useState<string>("");
     
     const router = useRouter();
     
@@ -20,6 +22,10 @@ export default function Login()
             {
                 router.push("/insert");
             }
+            else
+            {
+                setError(error.message)
+            }
         }
     };
     
@@ -29,12 +35,13 @@ export default function Login()
         {
             console.log("Signing up")
             const {data, error} = await supabase.auth.signUp({email: email, password: password})
-            console.log(data)
-            console.log("------------------------------------------")
-            console.log(error)
             if (!error)
             {
                 router.push("/insert");
+            }
+            else
+            {
+                setError(error.message)
             }
         }
     };
@@ -52,6 +59,7 @@ export default function Login()
             </label>
             <button className='border-2 border-red-400 w-20' onClick={loginClick}>Log in</button>
             <button className='border-2 border-green-400 w-20' onClick={registerClick}>Register</button>
+            <div>{error}</div>
         </div>
     )
 }
