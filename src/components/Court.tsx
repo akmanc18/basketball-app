@@ -10,7 +10,7 @@ interface Props
     players: Player[];
 }
 
-const playTypes: PlaysType[] = ["Shot", "Ball loss", "Steal", "Turnover", "Rebound"]
+const playTypes: PlaysType[] = ["Shot", "Foul", "Ball loss", "Steal", "Turnover", "Rebound"]
 
 export default function Court(props: Props) {
     const players = props.players;
@@ -69,41 +69,150 @@ export default function Court(props: Props) {
 
     const saveButtonClick = (event:any) =>
     {
-        const playType = playTypes[Math.abs(currentActionCounter % 5)];
+        const playType = playTypes[Math.abs(currentActionCounter % playTypes.length)];
         setShotDot(undefined);
         setSelectedPlayer(undefined);
         setShotResult(undefined);
     };
 
     const getPopup = (actionCounter: number, shotPosition: Position) => {
-        const playType = playTypes[Math.abs(actionCounter % 5)];
+        const playType = playTypes[Math.abs(actionCounter % playTypes.length)];
+        
+        const playerLabel = (
+            <label>
+                Player
+                <br/>
+                <select className='border-2 border-gray-400' name='players' id='players'
+                        onChange={changeSelectedPlayer}>
+                    {players.map(player =>
+                    (<option key={player.player_id} value={player.player_id}>{player.player_name}</option>)
+                    )}
+                </select>
+            </label>
+        )
 
-        const element = (
-          <div className='flex flex-col gap-y-3'>
-              <div className='flex text-center gap-5 justify-center place-content-between'>
-                  <label>
-                      Player
-                      <br/>
-                      <select className='border-2 border-gray-400' name='players' id='players'
-                              onChange={changeSelectedPlayer}>
-                          {players.map(player =>
-                            (<option key={player.player_id} value={player.player_id}>{player.player_name}</option>)
-                          )}
-                      </select>
-                  </label>
-                  <label>
-                      Game Timer
-                      <br/>
-                      <input className='text-center w-20 border-2 border-gray-400' type='text' value={gameTimer}
-                             onChange={(event) => setGameTimer(event.target.value)}/>
-                  </label>
-              </div>
-              <div className='flex items-end gap-2'>
-                  <button className='border-2 border-red-400 w-24' onClick={cancelButtonClick}>Cancel</button>
-                  <button className='border-2 border-green-400 w-24' onClick={saveButtonClick}>Save</button>
-              </div>
-          </div>
+        const timerLabel = (
+            <label>
+                Game Timer
+                <br/>
+                <input className='text-center w-20 border-2 border-gray-400' type='text' value={gameTimer}
+                        onChange={(event) => setGameTimer(event.target.value)}/>
+            </label>
+        )
+
+        let element: React.JSX.Element
+        if(playType == "Shot")
+        {
+            if(shotResult == "hit")
+            {
+                element = (
+                <div className='flex flex-col gap-y-3'>
+                    <div className='flex text-center gap-5 justify-center place-content-between'>
+                        {playerLabel}
+                        <label>
+                            Shot Result
+                            <br/>
+                            <select className='border-2 border-gray-400' name='players' id='players'
+                                    onChange={changeShotResult}>
+                                <option value='hit'>Hit</option>
+                                <option value='missed'>Missed</option>
+                                <option value='blocked'>Blocked</option>
+                            </select>
+                        </label>
+                        <label>
+                            Assist
+                            <br/>
+                            <select className='border-2 border-gray-400' name='players' id='players'
+                                    onChange={changeSelectedAssister}>
+                                {players.map(player =>
+                                    (<option key={player.player_id} value={player.player_id}>{player.player_name}</option>)
+                                )}
+                            </select>
+                        </label>
+                        {timerLabel}
+                    </div>
+                    <div className='flex justify-center items-end gap-2'>
+                        <button className='border-2 border-red-400 w-24' onClick={cancelButtonClick}>Cancel</button>
+                        <button className='border-2 border-green-400 w-24' onClick={saveButtonClick}>Save</button>
+                    </div>
+                </div>
+                );
+            }
+            else if(shotResult == "missed")
+            {
+                element = (
+                <div className='flex flex-col gap-y-3'>
+                    <div className='flex text-center gap-5 justify-center place-content-between'>
+                        {playerLabel}
+                        <label>
+                            Shot Result
+                            <br/>
+                            <select className='border-2 border-gray-400' name='players' id='players'
+                                    onChange={changeShotResult}>
+                                    <option value='hit'>Hit</option>
+                                <option value='missed'>Missed</option>
+                                <option value='blocked'>Blocked</option>
+                            </select>
+                        </label>
+                        {timerLabel}
+                    </div>
+                    <div className='flex justify-center items-end gap-2'>
+                        <button className='border-2 border-red-400 w-24' onClick={cancelButtonClick}>Cancel</button>
+                        <button className='border-2 border-green-400 w-24' onClick={saveButtonClick}>Save</button>
+                    </div>
+                </div>
+                );
+            }
+            else // shotResult == "blocked"
+            {
+                element = (
+                <div className='flex flex-col gap-y-3'>
+                    <div className='flex text-center gap-5 justify-center place-content-between'>
+                        {playerLabel}
+                        <label>
+                            Shot Result
+                            <br/>
+                            <select className='border-2 border-gray-400' name='players' id='players'
+                                    onChange={changeShotResult}>
+                                <option value='hit'>Hit</option>
+                                <option value='missed'>Missed</option>
+                                <option value='blocked'>Blocked</option>
+                            </select>
+                        </label>
+                        <label>
+                            Blocker
+                            <br/>
+                            <select className='border-2 border-gray-400' name='players' id='players' onChange={changeSelectedBlocker}>
+                                {players.map(player =>
+                                    (<option key={player.player_id} value={player.player_id}>{player.player_name}</option>)
+                                )}
+                            </select>
+                        </label>
+                        {timerLabel}
+                    </div>
+                    <div className='flex justify-center items-end gap-2'>
+                        <button className='border-2 border-red-400 w-24' onClick={cancelButtonClick}>Cancel</button>
+                        <button className='border-2 border-green-400 w-24' onClick={saveButtonClick}>Save</button>
+                    </div>
+                </div>
+                );
+            }
+        }
+        else
+        {
+            element = (
+            <div className='flex flex-col gap-y-3'>
+                <div className='flex text-center gap-5 justify-center place-content-between'>
+                    {playerLabel}
+                    {timerLabel}
+                </div>
+                <div className='flex justify-center items-end gap-2'>
+                    <button className='border-2 border-red-400 w-24' onClick={cancelButtonClick}>Cancel</button>
+                    <button className='border-2 border-green-400 w-24' onClick={saveButtonClick}>Save</button>
+                </div>
+            </div>
         );
+        }
 
         // uncomment this and delete the above const element to have different layouts based on playType.
         // the above const element is currently a copy of  the "Shot" case.
@@ -171,11 +280,11 @@ export default function Court(props: Props) {
         // }
 
         return (
-          <div className="p-3 popupDiv" style=
-          {{
-            left: shotPosition.xPos + 15,
-              top: shotPosition.yPos + 5,
-          }} >
+            <div className="p-3 popupDiv" style=
+            {{
+                left: shotPosition.xPos + 15,
+                top: shotPosition.yPos + 5,
+            }} >
                 <div className="flex flex-col">
                     <div className="flex gap-x-5 items-center justify-between">
                         <svg viewBox="0 0 25 25" className="w-10 cursor-pointer" onClick={(_) => setCurrentActionCounter( actionCounter - 1)}>
@@ -190,7 +299,7 @@ export default function Court(props: Props) {
                     </div>
                     {element}
                 </div>
-          </div>
+            </div>
         )
     }
 
