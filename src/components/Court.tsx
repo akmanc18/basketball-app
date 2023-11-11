@@ -18,8 +18,8 @@ export default function Court(props: Props) {
     const [selectedPlayer, setSelectedPlayer] = useState<number>();
     const [selectedBlocker, setSelectedBlocker] = useState<number>();
     const [selectedAssister, setSelectedAssister] = useState<number>();
-    const [shotDot, setShotDot] = useState<Position>();
-    const [foulDot, setFoulDot] = useState<Position>();
+    const [teamOneDot, setTeamOneDot] = useState<Position>();
+    const [teamTwoDot, setTeamTwoDot] = useState<Position>();
     const [shotResult, setShotResult] = useState<ShotResult>();
     const [gameTimer, setGameTimer] = useState<string>("00:00");
     const [currentActionCounter, setCurrentActionCounter] = useState<number>(0)
@@ -39,19 +39,19 @@ export default function Court(props: Props) {
         setSelectedAssister(event.target.value);
     };
 
-    const createShotDot = (event: any) => 
+    const createTeamOneDot = (event: any) => 
     {
         const {x, y} = event.nativeEvent;
-        setShotDot({xPos: x, yPos: y});
-        setFoulDot(undefined);
+        setTeamOneDot({xPos: x, yPos: y});
+        setTeamTwoDot(undefined);
     };
 
-    const createTurnoverDot = (event: any) => 
+    const createTeamTwoDot = (event: any) => 
     {
         event.preventDefault();
         const {x, y} = event.nativeEvent;
-        setFoulDot({xPos: x, yPos: y});
-        setShotDot(undefined);
+        setTeamTwoDot({xPos: x, yPos: y});
+        setTeamOneDot(undefined);
     };
 
     const changeShotResult = (event: any) =>
@@ -61,8 +61,8 @@ export default function Court(props: Props) {
 
     const cancelButtonClick = (event:any) =>
     {
-        setShotDot(undefined);
-        setFoulDot(undefined);
+        setTeamOneDot(undefined);
+        setTeamTwoDot(undefined);
         setSelectedPlayer(undefined);
         setShotResult(undefined);
     };
@@ -70,7 +70,8 @@ export default function Court(props: Props) {
     const saveButtonClick = (event:any) =>
     {
         const playType = playTypes[Math.abs(currentActionCounter % playTypes.length)];
-        setShotDot(undefined);
+        setTeamOneDot(undefined);
+        setTeamTwoDot(undefined);
         setSelectedPlayer(undefined);
         setShotResult(undefined);
     };
@@ -305,31 +306,31 @@ export default function Court(props: Props) {
 
     return (
         <div>
-            <Image src="/court.jpg" alt="Court image" width={860} height={462} onClick={createShotDot} onContextMenu={createTurnoverDot}>
+            <Image src="/court.jpg" alt="Court image" width={860} height={462} onClick={createTeamOneDot} onContextMenu={createTeamTwoDot}>
             </Image>
             {
-                shotDot &&
+                teamOneDot &&
                 (
                     <div>
                         <div className="redDot" style=
                         {{
-                            left: shotDot.xPos,
-                            top: shotDot.yPos,
+                            left: teamOneDot.xPos,
+                            top: teamOneDot.yPos,
                         }} />
-                        {getPopup(currentActionCounter, shotDot)}
+                        {getPopup(currentActionCounter, teamOneDot)}
                     </div>
                 )
             }
             {
-                foulDot &&
+                teamTwoDot &&
                 (
                     <div>
                         <div className="limeDot" style=
                         {{
-                            left: foulDot.xPos,
-                            top: foulDot.yPos,
+                            left: teamTwoDot.xPos,
+                            top: teamTwoDot.yPos,
                         }} />
-                        {getPopup(currentActionCounter, foulDot)}
+                        {getPopup(currentActionCounter, teamTwoDot)}
                     </div>
                 )
             }
