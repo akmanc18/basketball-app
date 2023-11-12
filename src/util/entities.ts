@@ -42,7 +42,10 @@ export interface Shot
 
 export interface ShotReview extends Shot
 {
-    player: {team_id: number, player_name: string}
+    player: {team_id: number, player_name: string},
+    assist_player: {team_id: number, player_name: string},
+    blocker_player: {team_id: number, player_name: string},
+
 }
 
 export interface OtherPlays
