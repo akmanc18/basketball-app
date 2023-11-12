@@ -2,6 +2,7 @@ import {Game, OtherPlays, OtherPlaysReview, Shot, ShotReview, Team} from "@/util
 import React, {useEffect, useState} from "react";
 import Image from "next/image";
 import supabase from "@/util/db";
+import {convertToGameTime} from "@/util/utils";
 
 interface Props
 {
@@ -94,175 +95,97 @@ export default function CourtReview(props: Props) {
             return teamId == team1.team_id ? "redDot reviewDot" :  "limeDot reviewDot"
         }
 
+        const createShotDivs = (inputShots: ShotReview[]) => {
+            return inputShots.map(shot =>
+              (
+                <div key={shot.shot_id}>
+                    <div className={getDotStyle(shot.player.team_id)} style=
+                      {{
+                          left: shot.shot_coordinates[0],
+                          top: shot.shot_coordinates[1],
+                      }} onClick={(_) => selectShotDot(shot.shot_id)}/>
+                    {
+                        shot.shot_id == selectedShotDot ?
+                          <div className="popupDiv" style=
+                            {{
+                                left: shot.shot_coordinates[0] + 15,
+                                top:  shot.shot_coordinates[1] + 5,
+                            }}>
+                              <div className="flex flex-col p-2">
+                                  <div className="text-xl text-center"> Shot</div>
+                                  <div className="flex gap-x-4">
+                                      <div>Player: {shot.player.player_name}</div>
+                                      <div>Team: {shot.player.team_id == team1.team_id ? team1.team_name : team2.team_name}</div>
+                                      <div>Game timer: {convertToGameTime(shot.game_timer)}</div>
+                                  </div>
+                                  <div className="flex gap-x-4">
+                                      <div>Shot Result: {shot.shot_result}</div>
+                                      <div>Point(s): {shot.point_value}</div>
+                                      {
+                                          shot.assister_id ?
+                                            <div>Assister: {shot.assister_id}</div>
+                                            : null
+                                      }
+                                  </div>
+                              </div>
+                          </div>
+                          :
+                          null
+                    }
+                </div>
+              ));
+        }
+
+        const createOtherPlaysDivs = (inputPlays: OtherPlaysReview[]) => {
+            return inputPlays.map(play =>
+          (
+            <div key={play.play_id}>
+                <div className={getDotStyle(play.player.team_id)} style=
+                  {{
+                      left: play.play_coordinates[0],
+                      top: play.play_coordinates[1],
+                  }} onClick={(_) => selectPlayDot(play.play_id)}/>
+                {
+                    play.play_id == selectedPlayDot ?
+                      <div className="popupDiv" style=
+                        {{
+                            left: play.play_coordinates[0] + 15,
+                            top:  play.play_coordinates[1] + 5,
+                        }}>
+                          <div className="flex flex-col p-2">
+                              <div className="text-xl text-center"> {play.play_type}</div>
+                              <div className="flex gap-x-4">
+                                  <div>Player: {play.player.player_name}</div>
+                                  <div>Game timer: {convertToGameTime(play.game_timer)}</div>
+                              </div>
+                          </div>
+                      </div>
+                      :
+                      null
+                }
+            </div>
+          ))
+        };
+
         switch (selectedPlayType) {
             case "All":
-                const shotDots = selectedShots.map(shot =>
-(
-                      <div key={shot.shot_id}>
-                          <div className={getDotStyle(shot.player.team_id)} style=
-                            {{
-                                left: shot.shot_coordinates[0],
-                                top: shot.shot_coordinates[1],
-                            }} onClick={(_) => selectShotDot(shot.shot_id)}/>
-                          {
-                              shot.shot_id == selectedShotDot ?
-                                <div className="popupDiv" style=
-                                  {{
-                                      left: shot.shot_coordinates[0] + 15,
-                                      top:  shot.shot_coordinates[1] + 5,
-                                  }}>
-                                    <div className="flex flex-col p-2">
-                                        <div className="text-xl text-center"> Shot</div>
-                                        <div className="flex gap-x-4">
-                                            <div>Player: {shot.player.player_name}</div>
-                                            <div>Point(s): {shot.point_value}</div>
-                                            <div>Game timer: {shot.game_timer}</div>
-                                        </div>
-                                    </div>
-                                </div>
-                                :
-                                null
-                          }
-                      </div>
-                    ));
-                const otherPlaysDots =  selectedOtherPlays.map(play =>
-                    (
-                      <div key={play.play_id}>
-                          <div className={getDotStyle(play.player.team_id)} style=
-                            {{
-                                left: play.play_coordinates[0],
-                                top: play.play_coordinates[1],
-                            }} onClick={(_) => selectPlayDot(play.play_id)}/>
-                          {
-                              play.play_id == selectedPlayDot ?
-                                <div className="popupDiv" style=
-                                  {{
-                                      left: play.play_coordinates[0] + 15,
-                                      top:  play.play_coordinates[1] + 5,
-                                  }}>
-                                    Test
-                                </div>
-                                :
-                                null
-                          }
-                      </div>
-                    ));
-                return [...shotDots, ...otherPlaysDots]
+                const shotsDots = createShotDivs(selectedShots);
+                const otherPlaysDots = createOtherPlaysDivs(selectedOtherPlays)
+                return [...shotsDots, ...otherPlaysDots];
             case "Shot":
-                return selectedShots.map(shot =>
-                    (
-                    <div key={shot.shot_id}>
-                      <div className={getDotStyle(shot.player.team_id)} style=
-                        {{
-                            left: shot.shot_coordinates[0],
-                            top: shot.shot_coordinates[1],
-                        }} onClick={(_) => selectShotDot(shot.shot_id)}/>
-                        {
-                            shot.shot_id == selectedShotDot ?
-                              <div className="popupDiv" style=
-                                {{
-                                    left: shot.shot_coordinates[0] + 15,
-                                    top:  shot.shot_coordinates[1] + 5,
-                                }}>
-                                  Test
-                              </div>
-                              :
-                              null
-                        }
-                    </div>
-                ));
+                return createShotDivs(selectedShots);
             case "Ball loss":
-                return selectedOtherPlays.filter(play => play.play_type == "Ball loss").map(play =>
-                     (
-                      <div key={play.play_id}>
-                          <div className={getDotStyle(play.player.team_id)} style=
-                            {{
-                                left: play.play_coordinates[0],
-                                top: play.play_coordinates[1],
-                            }} onClick={(_) => selectPlayDot(play.play_id)}/>
-                          {
-                              play.play_id == selectedPlayDot ?
-                                <div className="popupDiv" style=
-                                  {{
-                                      left: play.play_coordinates[0] + 15,
-                                      top: play.play_coordinates[1] + 5,
-                                  }}>
-                                    Test
-                                </div>
-                                :
-                                null
-                          }
-                      </div>
-                    ));
+                return createOtherPlaysDivs(selectedOtherPlays.filter(play => play.play_type == "Ball loss"))
+            case "Foul":
+                return createOtherPlaysDivs(selectedOtherPlays.filter(play => play.play_type == "Foul"))
             case "Steal":
-                return selectedOtherPlays.filter(play => play.play_type == "Steal").map(play =>
-                     (
-                      <div key={play.play_id}>
-                          <div className={getDotStyle(play.player.team_id)} style=
-                            {{
-                                left: play.play_coordinates[0],
-                                top: play.play_coordinates[1],
-                            }} onClick={(_) => selectPlayDot(play.play_id)}/>
-                          {
-                              play.play_id == selectedPlayDot ?
-                                <div className="popupDiv" style=
-                                  {{
-                                      left: play.play_coordinates[0] + 15,
-                                      top: play.play_coordinates[1] + 5,
-                                  }}>
-                                    Test
-                                </div>
-                                :
-                                null
-                          }
-                      </div>
-                    ));
+                return createOtherPlaysDivs(selectedOtherPlays.filter(play => play.play_type == "Steal"))
             case "Turnover":
-                return selectedOtherPlays.filter(play => play.play_type == "Turnover").map(play =>
-                     (
-                      <div key={play.play_id}>
-                          <div className={getDotStyle(play.player.team_id)} style=
-                            {{
-                                left: play.play_coordinates[0],
-                                top: play.play_coordinates[1],
-                            }} onClick={(_) => selectPlayDot(play.play_id)}/>
-                          {
-                              play.play_id == selectedPlayDot ?
-                                <div className="popupDiv" style=
-                                  {{
-                                      left: play.play_coordinates[0] + 15,
-                                      top: play.play_coordinates[1] + 5,
-                                  }}>
-                                    Test
-                                </div>
-                                :
-                                null
-                          }
-                      </div>
-                    ));
+                return createOtherPlaysDivs(selectedOtherPlays.filter(play => play.play_type == "Turnover"))
             case "Rebound":
-                return selectedOtherPlays.filter(play => play.play_type == "Rebound").map(play =>
-                     (
-                      <div key={play.play_id}>
-                          <div className={getDotStyle(play.player.team_id)} style=
-                            {{
-                                left: play.play_coordinates[0],
-                                top: play.play_coordinates[1],
-                            }} onClick={(_) => selectPlayDot(play.play_id)}/>
-                          {
-                              play.play_id == selectedPlayDot ?
-                                <div className="popupDiv" style=
-                                  {{
-                                      left: play.play_coordinates[0] + 15,
-                                      top: play.play_coordinates[1] + 5,
-                                  }}>
-                                    Test
-                                </div>
-                                :
-                                null
-                          }
-                      </div>
-                    ));
+                return createOtherPlaysDivs(selectedOtherPlays.filter(play => play.play_type == "Rebound"))
+            default:
+                return (<div className="text-red-500"> Error </div>)
         }
     }
 
@@ -281,7 +204,7 @@ export default function CourtReview(props: Props) {
               </label>
               <label>
                   Play type:
-                  <select className="ml-2 border-2 border-gray-400" onChange={(event) => setSelectedPlayType(event.target.value)}>
+                  <select className="ml-2 border-2 border-gray-400" onChange={(event) => {setSelectedPlayType(event.target.value); setSelectedDot(0), setSelectedPlayDot(0)}}>
                       <option value="All">All</option>
                       <option value="Shot">Shot</option>
                       <option value="Foul">Foul</option>
@@ -302,7 +225,7 @@ export default function CourtReview(props: Props) {
           </div>
           <div className="border border-gray-400 mt-2"/>
           <div className="self-center mt-4 relative">
-              <Image src="/court.jpg" alt="Court image" width={860} height={462}/>
+              <Image src="/court.jpg" alt="Court image" width={860} height={462} onClick={(_) => {selectPlayDot(0); selectShotDot(0)}}/>
               {
                   getDots()
               }

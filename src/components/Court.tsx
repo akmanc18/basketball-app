@@ -22,9 +22,11 @@ export default function Court(props: Props) {
     const [selectedBlocker, setSelectedBlocker] = useState<number>();
     const [selectedAssister, setSelectedAssister] = useState<number>();
     const [teamOneDot, setTeamOneDot] = useState<Position>();
+    const [teamOneDotRelative, setTeamOneDotRelative] = useState<Position>();
     const [teamTwoDot, setTeamTwoDot] = useState<Position>();
+    const [teamTwoDotRelative, setTeamTwoDotRelative] = useState<Position>();
     const [shotResult, setShotResult] = useState<ShotResult>();
-    const [gameTimer, setGameTimer] = useState<number>();
+    const [gameTimer, setGameTimer] = useState<string>("");
     const [currentActionCounter, setCurrentActionCounter] = useState<number>(0);
 
     const changeSelectedPlayer = (event: any) => 
@@ -42,19 +44,29 @@ export default function Court(props: Props) {
         setSelectedAssister(event.target.value);
     };
 
-    const createTeamOneDot = (event: any) => 
+    const createTeamOneDot = (event:  React.MouseEvent<HTMLImageElement, MouseEvent>) =>
     {
+        const bounds = event.currentTarget.getBoundingClientRect();
+        const xRelative = Math.round(event.clientX - bounds.left);
+        const yRelative = Math.round(event.clientY - bounds.top);
         const {x, y} = event.nativeEvent;
         setTeamOneDot({xPos: x, yPos: y});
+        setTeamOneDotRelative({xPos: xRelative, yPos: yRelative})
         setTeamTwoDot(undefined);
+        setTeamTwoDotRelative(undefined)
     };
 
-    const createTeamTwoDot = (event: any) => 
+    const createTeamTwoDot = (event: any) =>
     {
         event.preventDefault();
+        const bounds = event.currentTarget.getBoundingClientRect();
+        const xRelative = Math.round(event.clientX - bounds.left);
+        const yRelative = Math.round(event.clientY - bounds.top);
         const {x, y} = event.nativeEvent;
         setTeamTwoDot({xPos: x, yPos: y});
+        setTeamTwoDot({xPos:xRelative, yPos: yRelative})
         setTeamOneDot(undefined);
+        setTeamOneDotRelative(undefined)
     };
 
     const changeShotResult = (event: any) =>
@@ -86,13 +98,13 @@ export default function Court(props: Props) {
 
     async function savePlayToDatabase(playType: PlaysType)
     {
-        const teamDot = teamOneDot ? teamOneDot : teamTwoDot
+        const teamDot = teamOneDotRelative ? teamOneDotRelative : teamTwoDotRelative
 
         if(playType == "Shot")
         {
             const { error } = await supabase.from("Shots").insert({
                 game_id: gameId,
-                game_timer: gameTimer!,
+                game_timer: convertFromGameTime(gameTimer!),
                 player_id: selectedPlayer!,
                 point_value: 2,
                 assister_id: selectedAssister == -1 ? null : selectedAssister,
@@ -106,7 +118,7 @@ export default function Court(props: Props) {
         {
             const { error } = await supabase.from("OtherPlays").insert({
                 game_id: gameId,
-                game_timer: gameTimer!,
+                game_timer: convertFromGameTime(gameTimer!),
                 play_type: playType,
                 player_id: selectedPlayer!,
                 play_coordinates: [teamDot!.xPos, teamDot!.yPos]
@@ -137,7 +149,7 @@ export default function Court(props: Props) {
                 Game Timer
                 <br/>
                 <input className='text-center w-20 border-2 border-gray-400' type='text' value={gameTimer}
-                        onChange={(event) => setGameTimer(convertFromGameTime(event.target.value))}/>
+                        onChange={(event) => setGameTimer(event.target.value)}/>
             </label>
         )
 
@@ -262,71 +274,6 @@ export default function Court(props: Props) {
             </div>
         );
         }
-
-        // uncomment this and delete the above const element to have different layouts based on playType.
-        // the above const element is currently a copy of  the "Shot" case.
-
-        // let element : React.JSX.Element;
-        // switch (playType)
-        // {
-        //     case "Shot":
-        //         element = (
-        //           <div className='flex flex-col gap-y-3'>
-        //               <div className='flex text-center gap-5 justify-center place-content-between'>
-        //                   <label>
-        //                       Player
-        //                       <br/>
-        //                       <select className='border-2 border-gray-400' name='players' id='players' onChange={changeSelectedPlayer}>
-        //                           {players.map(player =>
-        //                             (<option key={player.player_id} value={player.player_id}>{player.player_name}</option>)
-        //                           )}
-        //                       </select>
-        //                   </label>
-        //                   <label>
-        //                       Game Timer
-        //                       <br/>
-        //                       <input className='text-center w-20 border-2 border-gray-400' type='text' value={gameTimer} onChange={(event) => setGameTimer(event.target.value)}/>
-        //                   </label>
-        //               </div>
-        //               <div className='flex items-end gap-2'>
-        //                   <button className='border-2 border-red-400 w-24' onClick={cancelButtonClick}>Cancel</button>
-        //                   <button className='border-2 border-green-400 w-24' onClick={saveFoulButtonClick}>Save</button>
-        //               </div>
-        //           </div>
-        //         );
-        //         break;
-        //     case "Ball loss":
-        //         element = (
-        //           <div className='flex flex-col gap-y-3'>
-        //
-        //           </div>
-        //         );
-        //         break;
-        //     case "Steal":
-        //         element = (
-        //           <div className='flex flex-col gap-y-3'>
-        //
-        //           </div>
-        //         );
-        //         break;
-        //     case "Turnover":
-        //         element = (
-        //           <div className='flex flex-col gap-y-3'>
-        //
-        //           </div>
-        //         );
-        //         break;
-        //     case "Rebound":
-        //         element = (
-        //           <div className='flex flex-col gap-y-3'>
-        //
-        //           </div>
-        //         );
-        //         break;
-        //     default:
-        //         element = (<div> Error </div>);
-        //         break;
-        // }
 
         return (
             <div className="p-3 popupDiv" style=
