@@ -35,7 +35,7 @@ export default function Stats()
 
     const getGames = async () =>
     {
-        const { data , error} = await supabase.from("Games").select().returns<Game[]>();
+        const { data , error } = await supabase.from("Games").select().returns<Game[]>();
         if (error)
         {
             console.error(error);

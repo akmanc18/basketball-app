@@ -54,7 +54,7 @@ export interface Database {
       OtherPlays: {
         Row: {
           game_id: number
-          game_timer: string
+          game_timer: number
           play_coordinates: number[]
           play_id: number
           play_type: string
@@ -62,7 +62,7 @@ export interface Database {
         }
         Insert: {
           game_id: number
-          game_timer: string
+          game_timer: number
           play_coordinates: number[]
           play_id?: number
           play_type: string
@@ -70,7 +70,7 @@ export interface Database {
         }
         Update: {
           game_id?: number
-          game_timer?: string
+          game_timer?: number
           play_coordinates?: number[]
           play_id?: number
           play_type?: string
@@ -124,7 +124,7 @@ export interface Database {
           assister_id: number | null
           blocker_id: number | null
           game_id: number
-          game_timer: string
+          game_timer: number
           player_id: number
           point_value: number
           shot_coordinates: number[]
@@ -135,7 +135,7 @@ export interface Database {
           assister_id?: number | null
           blocker_id?: number | null
           game_id: number
-          game_timer: string
+          game_timer: number
           player_id: number
           point_value: number
           shot_coordinates: number[]
@@ -146,7 +146,7 @@ export interface Database {
           assister_id?: number | null
           blocker_id?: number | null
           game_id?: number
-          game_timer?: string
+          game_timer?: number
           player_id?: number
           point_value?: number
           shot_coordinates?: number[]

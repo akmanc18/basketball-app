@@ -2,6 +2,7 @@
 
 import supabase from '@/util/db';
 import {Player, PlaysType, Position, ShotResult} from '@/util/entities'
+import { convertFromGameTime } from '@/util/utils';
 import Image from 'next/image'
 import React, { useState} from 'react'
 
@@ -23,7 +24,7 @@ export default function Court(props: Props) {
     const [teamOneDot, setTeamOneDot] = useState<Position>();
     const [teamTwoDot, setTeamTwoDot] = useState<Position>();
     const [shotResult, setShotResult] = useState<ShotResult>();
-    const [gameTimer, setGameTimer] = useState<string>("00:00");
+    const [gameTimer, setGameTimer] = useState<number>();
     const [currentActionCounter, setCurrentActionCounter] = useState<number>(0);
 
     const changeSelectedPlayer = (event: any) => 
@@ -91,7 +92,7 @@ export default function Court(props: Props) {
         {
             const { error } = await supabase.from("Shots").insert({
                 game_id: gameId,
-                game_timer: gameTimer,
+                game_timer: gameTimer!,
                 player_id: selectedPlayer!,
                 point_value: 2,
                 assister_id: selectedAssister == -1 ? null : selectedAssister,
@@ -105,7 +106,7 @@ export default function Court(props: Props) {
         {
             const { error } = await supabase.from("OtherPlays").insert({
                 game_id: gameId,
-                game_timer: gameTimer,
+                game_timer: gameTimer!,
                 play_type: playType,
                 player_id: selectedPlayer!,
                 play_coordinates: [teamDot!.xPos, teamDot!.yPos]
@@ -136,7 +137,7 @@ export default function Court(props: Props) {
                 Game Timer
                 <br/>
                 <input className='text-center w-20 border-2 border-gray-400' type='text' value={gameTimer}
-                        onChange={(event) => setGameTimer(event.target.value)}/>
+                        onChange={(event) => setGameTimer(convertFromGameTime(event.target.value))}/>
             </label>
         )
 
