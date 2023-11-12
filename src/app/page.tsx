@@ -47,19 +47,29 @@ export default function Login()
     };
 
     return (
-        <div>
-            <label>
-                Email
-                <input className='text-center w-20 border-2 border-gray-400' type='text' value={email} onChange={(event) => setEmail(event.target.value)}/>
-            </label>
-            <br/>
-            <label>
-                Password
-                <input className='text-center w-20 border-2 border-gray-400' type='password' value={password} onChange={(event) => setPassword(event.target.value)}/>
-            </label>
-            <button className='border-2 border-red-400 w-20' onClick={loginClick}>Log in</button>
-            <button className='border-2 border-green-400 w-20' onClick={registerClick}>Register</button>
-            <div>{error}</div>
+      <div>
+        <div className="flex flex-col gap-y-4">
+            <h1 className="text-4xl text-center mb-2">Login</h1>
+            <div className="flex">
+                <label htmlFor="email">Email:</label>
+                <input name="email" className='border-2 border-gray-400 ml-2 flex-grow px-1' type='email' value={email} onChange={(event) => setEmail(event.target.value)}/>
+            </div>
+            <div className="flex">
+                <label htmlFor="password">Password:</label>
+                <input name="password" className='border-2 border-gray-400 ml-2 flex-grow px-1' type='password' value={password} onChange={(event) => setPassword(event.target.value)}/>
+
+            </div>
+            <div className="flex gap-x-2 justify-center">
+                <button className='border-2 border-gray-400 w-20' onClick={loginClick}>Log in</button>
+                <button className='border-2 border-gray-400 w-20' onClick={registerClick}>Register</button>
+            </div>
         </div>
+        {
+            error ?
+              <div className="text-center mt-4 text-red-500">Error: {error}</div>
+              :
+              null
+        }
+      </div>
     )
 }
