@@ -142,6 +142,7 @@ export default function Stats()
 
     useEffect(() => {
         getData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [game])
 
     const onGameChange = (event: React.ChangeEvent<HTMLSelectElement>) => {

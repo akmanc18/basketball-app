@@ -1,6 +1,7 @@
 "use client"
 
-import {Player, PlaysType, Position, ShotResult} from '@/util/entities'
+import supabase from '@/util/db';
+import {Player, PlaysType, Position, ShotResult, Team} from '@/util/entities'
 import Image from 'next/image'
 import { Input } from 'postcss';
 import React, {useCallback, useState} from 'react'
@@ -67,14 +68,31 @@ export default function Court(props: Props) {
         setShotResult(undefined);
     };
 
-    const saveButtonClick = (event:any) =>
+    const saveButtonClick = async (event:any) =>
     {
         const playType = playTypes[Math.abs(currentActionCounter % playTypes.length)];
+        await savePlayToDatabase();
         setTeamOneDot(undefined);
         setTeamTwoDot(undefined);
         setSelectedPlayer(undefined);
         setShotResult(undefined);
     };
+
+    async function savePlayToDatabase()
+    {
+        const teamDot = teamOneDot ? teamOneDot : teamTwoDot
+
+        const { error } = await supabase.from("Shots").insert({
+            game_id: 1,
+            game_timer: gameTimer,
+            player_id: selectedPlayer!,
+            point_value: 2,
+            assister_id: selectedAssister,
+            shot_result: shotResult!,
+            blocker_id: selectedBlocker,
+            shot_coordinates: [teamDot!.xPos, teamDot!.yPos]
+        });
+    }
 
     const getPopup = (actionCounter: number, shotPosition: Position) => {
         const playType = playTypes[Math.abs(actionCounter % playTypes.length)];
@@ -150,7 +168,7 @@ export default function Court(props: Props) {
                             <br/>
                             <select className='border-2 border-gray-400' name='players' id='players'
                                     onChange={changeShotResult}>
-                                    <option value='hit'>Hit</option>
+                                <option value='hit'>Hit</option>
                                 <option value='missed'>Missed</option>
                                 <option value='blocked'>Blocked</option>
                             </select>
