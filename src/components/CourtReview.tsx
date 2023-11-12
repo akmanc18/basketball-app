@@ -2,7 +2,7 @@ import {Game, OtherPlays, OtherPlaysReview, Shot, ShotReview, Team} from "@/util
 import React, {useEffect, useState} from "react";
 import Image from "next/image";
 import supabase from "@/util/db";
-import {convertToGameTime} from "@/util/utils";
+import {convertFromGameTime, convertToGameTime} from "@/util/utils";
 
 interface Props
 {
@@ -23,6 +23,8 @@ export default function CourtReview(props: Props) {
     const [selectedPlayType, setSelectedPlayType] = useState<string>("All");
     const [selectedShotDot, setSelectedDot] = useState<number>(0);
     const [selectedPlayDot, setSelectedPlayDot] = useState<number>(0);
+    const [timeFrom, setTimeFrom] = useState<string>("");
+    const [timeTo, setTimeTo] = useState<string>("");
 
 
     const getOtherPlays = async () => {
@@ -30,7 +32,6 @@ export default function CourtReview(props: Props) {
 
         if (data)
         {
-            console.log(data)
             setOtherPlays(data);
         }
         if (error)
@@ -44,7 +45,7 @@ export default function CourtReview(props: Props) {
     }, [game])
 
     const getShots = async () => {
-        const { data , error} = await supabase.from("Shots").select("*, player:Players!Shots_player_id_fkey(team_id, player_name)").eq("game_id", game.game_id).returns<ShotReview[]>();
+        const { data , error} = await supabase.from("Shots").select("*, player:Players!Shots_player_id_fkey(team_id, player_name), assist_player:Players!Shots_assister_id_fkey(team_id, player_name), blocker_player:Players!Shots_blocker_id_fkey(team_id, player_name)").eq("game_id", game.game_id).returns<ShotReview[]>();
 
         if (data)
         {
@@ -90,6 +91,20 @@ export default function CourtReview(props: Props) {
             selectedOtherPlays = otherPlays.filter(otherPlay => otherPlay.player.team_id == team2.team_id);
         }
 
+        if (timeFrom)
+        {
+            const secondsFrom = convertFromGameTime(timeFrom);
+            selectedShots = selectedShots.filter(shot => shot.game_timer >= secondsFrom);
+            selectedOtherPlays = selectedOtherPlays.filter(play => play.game_timer > secondsFrom);
+        }
+
+        if (timeTo)
+        {
+            const secondsTo = convertFromGameTime(timeTo)
+            selectedShots = selectedShots.filter(shot => shot.game_timer <= secondsTo);
+            selectedOtherPlays = selectedOtherPlays.filter(play => play.game_timer < secondsTo);
+        }
+
         const getDotStyle = (teamId: number) =>
         {
             return teamId == team1.team_id ? "redDot reviewDot" :  "limeDot reviewDot"
@@ -105,32 +120,37 @@ export default function CourtReview(props: Props) {
                           top: shot.shot_coordinates[1],
                       }} onClick={(_) => selectShotDot(shot.shot_id)}/>
                     {
-                        shot.shot_id == selectedShotDot ?
-                          <div className="popupDiv" style=
-                            {{
-                                left: shot.shot_coordinates[0] + 15,
-                                top:  shot.shot_coordinates[1] + 5,
-                            }}>
-                              <div className="flex flex-col p-2">
-                                  <div className="text-xl text-center"> Shot</div>
-                                  <div className="flex gap-x-4">
-                                      <div>Player: {shot.player.player_name}</div>
-                                      <div>Team: {shot.player.team_id == team1.team_id ? team1.team_name : team2.team_name}</div>
-                                      <div>Game timer: {convertToGameTime(shot.game_timer)}</div>
-                                  </div>
-                                  <div className="flex gap-x-4">
-                                      <div>Shot Result: {shot.shot_result}</div>
-                                      <div>Point(s): {shot.point_value}</div>
-                                      {
-                                          shot.assister_id ?
-                                            <div>Assister: {shot.assister_id}</div>
-                                            : null
-                                      }
-                                  </div>
+                    shot.shot_id == selectedShotDot ?
+                      <div className="popupDiv" style=
+                        {{
+                            left: shot.shot_coordinates[0] + 15,
+                            top:  shot.shot_coordinates[1] + 5,
+                        }}>
+                          <div className="flex flex-col p-2 w-max">
+                              <div className="text-xl text-center"> Shot</div>
+                              <div className="flex gap-x-4">
+                                  <div>Player: {shot.player.player_name}</div>
+                                  <div>Team: {shot.player.team_id == team1.team_id ? team1.team_name : team2.team_name}</div>
+                                  <div>Game timer: {convertToGameTime(shot.game_timer)}</div>
+                              </div>
+                              <div className="flex gap-x-4">
+                                  <div>Shot Result: {shot.shot_result}</div>
+                                  <div>Point(s): {shot.point_value}</div>
+                                  {
+                                      shot.assister_id ?
+                                        <div>Assist: {shot.assist_player.player_name}</div>
+                                        : null
+                                  }
+                                  {
+                                      shot.blocker_id ?
+                                        <div>Blocker: {shot.blocker_player.player_name}</div>
+                                        : null
+                                  }
                               </div>
                           </div>
-                          :
-                          null
+                      </div>
+                      :
+                      null
                     }
                 </div>
               ));
@@ -152,7 +172,7 @@ export default function CourtReview(props: Props) {
                             left: play.play_coordinates[0] + 15,
                             top:  play.play_coordinates[1] + 5,
                         }}>
-                          <div className="flex flex-col p-2">
+                          <div className="flex flex-col p-2 w-max">
                               <div className="text-xl text-center"> {play.play_type}</div>
                               <div className="flex gap-x-4">
                                   <div>Player: {play.player.player_name}</div>
@@ -204,7 +224,7 @@ export default function CourtReview(props: Props) {
               </label>
               <label>
                   Play type:
-                  <select className="ml-2 border-2 border-gray-400" onChange={(event) => {setSelectedPlayType(event.target.value); setSelectedDot(0), setSelectedPlayDot(0)}}>
+                  <select className="ml-2 border-2 border-gray-400" onChange={(event) => {setSelectedPlayType(event.target.value); setSelectedDot(0); setSelectedPlayDot(0)}}>
                       <option value="All">All</option>
                       <option value="Shot">Shot</option>
                       <option value="Foul">Foul</option>
@@ -216,11 +236,11 @@ export default function CourtReview(props: Props) {
               </label>
               <label>
                   Game time from:
-                  <input className="ml-2 border-2 border-gray-400 w-20" type="text"/>
+                  <input className="ml-2 border-2 border-gray-400 w-20" type="text" onChange={(event) => {setTimeFrom(event.target.value);setSelectedDot(0); setSelectedPlayDot(0)}}/>
               </label>
               <label>
                   Game time to:
-                  <input className="ml-2 border-2 border-gray-400 w-20" type="text"/>
+                  <input className="ml-2 border-2 border-gray-400 w-20" type="text" onChange={(event) => {setTimeTo(event.target.value);setSelectedDot(0); setSelectedPlayDot(0)}}/>
               </label>
           </div>
           <div className="border border-gray-400 mt-2"/>
