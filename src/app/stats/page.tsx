@@ -109,18 +109,18 @@ export default function Stats()
                     turnovers: player.Turnovers.length,
                     onePointShot: {
                         attempted: onePointShots.length,
-                        successful: onePointShots.filter(shot => shot.successful).length,
-                        percentage: onePointShots.length > 0 ? (onePointShots.filter(shot => shot.successful).length / onePointShots.length * 100) : 0,
+                        successful: onePointShots.filter(shot => shot.shot_result == "hit").length,
+                        percentage: onePointShots.length > 0 ? (onePointShots.filter(shot => shot.shot_result == "hit").length / onePointShots.length * 100) : 0,
                     },
                     twoPointShot: {
                         attempted: twoPointShots.length,
-                        successful: twoPointShots.filter(shot => shot.successful).length,
-                        percentage: twoPointShots.length > 0 ? (twoPointShots.filter(shot => shot.successful).length / twoPointShots.length * 100) : 0,
+                        successful: twoPointShots.filter(shot => shot.shot_result == "hit").length,
+                        percentage: twoPointShots.length > 0 ? (twoPointShots.filter(shot => shot.shot_result == "hit").length / twoPointShots.length * 100) : 0,
                     },
                     threePointShot: {
                         attempted: threePointShots.length,
-                        successful: threePointShots.filter(shot => shot.successful).length,
-                        percentage: threePointShots.length > 0 ? (threePointShots.filter(shot => shot.successful).length / threePointShots.length * 100) : 0,
+                        successful: threePointShots.filter(shot => shot.shot_result == "hit").length,
+                        percentage: threePointShots.length > 0 ? (threePointShots.filter(shot => shot.shot_result == "hit").length / threePointShots.length * 100) : 0,
                     },
 
                 }

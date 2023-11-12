@@ -35,18 +35,21 @@ export interface Database {
           {
             foreignKeyName: "Blocks_blocked_shot_id_fkey"
             columns: ["blocked_shot_id"]
+            isOneToOne: false
             referencedRelation: "Shots"
             referencedColumns: ["shot_id"]
           },
           {
             foreignKeyName: "Blocks_game_id_fkey"
             columns: ["game_id"]
+            isOneToOne: false
             referencedRelation: "Games"
             referencedColumns: ["game_id"]
           },
           {
             foreignKeyName: "Blocks_player_id_fkey"
             columns: ["player_id"]
+            isOneToOne: false
             referencedRelation: "Players"
             referencedColumns: ["player_id"]
           }
@@ -81,12 +84,14 @@ export interface Database {
           {
             foreignKeyName: "Games_team_1_fkey"
             columns: ["team_1"]
+            isOneToOne: false
             referencedRelation: "Teams"
             referencedColumns: ["team_id"]
           },
           {
             foreignKeyName: "Games_team_2_fkey"
             columns: ["team_2"]
+            isOneToOne: false
             referencedRelation: "Teams"
             referencedColumns: ["team_id"]
           }
@@ -112,6 +117,7 @@ export interface Database {
           {
             foreignKeyName: "Players_team_id_fkey"
             columns: ["team_id"]
+            isOneToOne: false
             referencedRelation: "Teams"
             referencedColumns: ["team_id"]
           }
@@ -119,39 +125,64 @@ export interface Database {
       }
       Shots: {
         Row: {
+          assister_id: number | null
+          blocker_id: number | null
           game_id: number
           game_timer: string
           player_id: number
           point_value: number
+          shot_coordinates: number[]
           shot_id: number
-          successful: boolean
+          shot_result: string
         }
         Insert: {
+          assister_id?: number | null
+          blocker_id?: number | null
           game_id: number
           game_timer: string
           player_id: number
           point_value: number
+          shot_coordinates: number[]
           shot_id?: number
-          successful: boolean
+          shot_result: string
         }
         Update: {
+          assister_id?: number | null
+          blocker_id?: number | null
           game_id?: number
           game_timer?: string
           player_id?: number
           point_value?: number
+          shot_coordinates?: number[]
           shot_id?: number
-          successful?: boolean
+          shot_result?: string
         }
         Relationships: [
           {
-            foreignKeyName: "shots_game_id_fkey"
+            foreignKeyName: "Shots_assister_id_fkey"
+            columns: ["assister_id"]
+            isOneToOne: false
+            referencedRelation: "Players"
+            referencedColumns: ["player_id"]
+          },
+          {
+            foreignKeyName: "Shots_blocker_id_fkey"
+            columns: ["blocker_id"]
+            isOneToOne: false
+            referencedRelation: "Players"
+            referencedColumns: ["player_id"]
+          },
+          {
+            foreignKeyName: "Shots_game_id_fkey"
             columns: ["game_id"]
+            isOneToOne: false
             referencedRelation: "Games"
             referencedColumns: ["game_id"]
           },
           {
-            foreignKeyName: "shots_player_id_fkey"
+            foreignKeyName: "Shots_player_id_fkey"
             columns: ["player_id"]
+            isOneToOne: false
             referencedRelation: "Players"
             referencedColumns: ["player_id"]
           }
@@ -195,12 +226,14 @@ export interface Database {
           {
             foreignKeyName: "Turnovers_game_id_fkey"
             columns: ["game_id"]
+            isOneToOne: false
             referencedRelation: "Games"
             referencedColumns: ["game_id"]
           },
           {
             foreignKeyName: "Turnovers_player_id_fkey"
             columns: ["player_id"]
+            isOneToOne: false
             referencedRelation: "Players"
             referencedColumns: ["player_id"]
           }

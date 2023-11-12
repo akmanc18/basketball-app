@@ -29,12 +29,22 @@ export interface Game
 
 export interface Shot
 {
-    game_id: number,
-    game_timer: string,
-    player_id: number,
-    point_value: number,
     shot_id: number,
-    successful: boolean
+    game_id: number,
+    player_id: number,
+    game_timer: string,
+    point_value: number,
+    shot_result: string,
+    blocker_id: number | null,
+    assister_id: number | null
+}
+
+export interface OtherPlays
+{
+    play_id: number,
+    game_id: number,
+    player_id: number,
+    game_timer: string
 }
 
 export interface PlayerTableData
