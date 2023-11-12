@@ -42,6 +42,7 @@ export default function CourtReview(props: Props) {
 
     useEffect(() => {
         getOtherPlays();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [game])
 
     const getShots = async () => {
@@ -59,6 +60,7 @@ export default function CourtReview(props: Props) {
 
     useEffect(() => {
         getShots();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [game])
 
     const selectShotDot = (shotId: number) => {

@@ -14,6 +14,7 @@ export interface Player
 {
     player_id: number;
     player_name: string;
+    player_number: number,
     team_id: number | null;
 }
 
@@ -66,13 +67,18 @@ export interface OtherPlaysReview extends OtherPlays
 export interface PlayerTableData
 {
     playerId: number,
-    playerName: string;
-    playerNumber: number;
-    threePointShot: ShotData;
-    twoPointShot: ShotData;
-    onePointShot: ShotData;
-    blocks: number;
-    turnovers: number
+    playerName: string,
+    playerNumber: number,
+    threePointShot: ShotData,
+    twoPointShot: ShotData,
+    onePointShot: ShotData,
+    block: number,
+    assist: number,
+    foul: number,
+    ballLoss: number,
+    steal: number,
+    turnover: number,
+    rebound: number,
 }
 
 export interface ShotData

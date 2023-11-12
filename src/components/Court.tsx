@@ -1,7 +1,7 @@
 "use client"
 
 import supabase from '@/util/db';
-import {Player, PlaysType, Position, ShotResult} from '@/util/entities'
+import {Game, Player, PlaysType, Position, ShotResult} from '@/util/entities'
 import { convertFromGameTime } from '@/util/utils';
 import Image from 'next/image'
 import React, { useState} from 'react'
@@ -9,14 +9,14 @@ import React, { useState} from 'react'
 interface Props
 {
     players: Player[];
-    gameId: number;
+    game: Game;
 }
 
 const playTypes: PlaysType[] = ["Shot", "Foul", "Ball loss", "Steal", "Turnover", "Rebound"]
 
 export default function Court(props: Props) {
     const players = props.players;
-    const gameId = props.gameId;
+    const game = props.game;
 
     const [selectedPlayer, setSelectedPlayer] = useState<number>();
     const [selectedBlocker, setSelectedBlocker] = useState<number>();
@@ -25,6 +25,8 @@ export default function Court(props: Props) {
     const [teamOneDotRelative, setTeamOneDotRelative] = useState<Position>();
     const [teamTwoDot, setTeamTwoDot] = useState<Position>();
     const [teamTwoDotRelative, setTeamTwoDotRelative] = useState<Position>();
+    const [currentTeamId, setCurrentTeamId] = useState<number>();
+    const [oppositeTeamId, setOppositeTeamId] = useState<number>();
     const [shotResult, setShotResult] = useState<ShotResult>();
     const [gameTimer, setGameTimer] = useState<string>("");
     const [currentActionCounter, setCurrentActionCounter] = useState<number>(0);
@@ -44,19 +46,21 @@ export default function Court(props: Props) {
         setSelectedAssister(event.target.value);
     };
 
-    const createTeamOneDot = (event:  React.MouseEvent<HTMLImageElement, MouseEvent>) =>
+    const createTeamOneDot = (event: React.MouseEvent<HTMLImageElement, MouseEvent>) =>
     {
         const bounds = event.currentTarget.getBoundingClientRect();
         const xRelative = Math.round(event.clientX - bounds.left);
         const yRelative = Math.round(event.clientY - bounds.top);
         const {x, y} = event.nativeEvent;
         setTeamOneDot({xPos: x, yPos: y});
-        setTeamOneDotRelative({xPos: xRelative, yPos: yRelative})
+        setTeamOneDotRelative({xPos: xRelative, yPos: yRelative});
         setTeamTwoDot(undefined);
-        setTeamTwoDotRelative(undefined)
+        setTeamTwoDotRelative(undefined);
+        setCurrentTeamId(game.team_1);
+        setOppositeTeamId(game.team_2);
     };
 
-    const createTeamTwoDot = (event: any) =>
+    const createTeamTwoDot = (event: React.MouseEvent<HTMLImageElement, MouseEvent>) =>
     {
         event.preventDefault();
         const bounds = event.currentTarget.getBoundingClientRect();
@@ -64,9 +68,11 @@ export default function Court(props: Props) {
         const yRelative = Math.round(event.clientY - bounds.top);
         const {x, y} = event.nativeEvent;
         setTeamTwoDot({xPos: x, yPos: y});
-        setTeamTwoDot({xPos:xRelative, yPos: yRelative})
+        setTeamTwoDotRelative({xPos:xRelative, yPos: yRelative});
         setTeamOneDot(undefined);
-        setTeamOneDotRelative(undefined)
+        setTeamOneDotRelative(undefined);
+        setCurrentTeamId(game.team_2);
+        setOppositeTeamId(game.team_1);
     };
 
     const changeShotResult = (event: any) =>
@@ -103,7 +109,7 @@ export default function Court(props: Props) {
         if(playType == "Shot")
         {
             const { error } = await supabase.from("Shots").insert({
-                game_id: gameId,
+                game_id: game.game_id,
                 game_timer: convertFromGameTime(gameTimer!),
                 player_id: selectedPlayer!,
                 point_value: 2,
@@ -117,7 +123,7 @@ export default function Court(props: Props) {
         else
         {
             const { error } = await supabase.from("OtherPlays").insert({
-                game_id: gameId,
+                game_id: game.game_id,
                 game_timer: convertFromGameTime(gameTimer!),
                 play_type: playType,
                 player_id: selectedPlayer!,
@@ -137,8 +143,8 @@ export default function Court(props: Props) {
                 <select className='border-2 border-gray-400' name='players' id='players'
                         onChange={changeSelectedPlayer} defaultValue="">
                     <option value="" disabled>Select</option>
-                    {players.map(player =>
-                    (<option key={player.player_id} value={player.player_id}>{player.player_name}</option>)
+                    {players.filter(player => player.team_id == currentTeamId).map(player =>
+                    (<option key={player.player_id} value={player.player_id}>{"(" + player.player_number + ") " + player.player_name}</option>)
                     )}
                 </select>
             </label>
@@ -193,8 +199,8 @@ export default function Court(props: Props) {
                                     onChange={changeSelectedAssister} defaultValue="">
                                 <option value="" disabled>Select</option>
                                 <option value={-1}>No assist</option>
-                                {players.map(player =>
-                                    (<option key={player.player_id} value={player.player_id}>{player.player_name}</option>)
+                                {players.filter(player => player.team_id == currentTeamId).map(player =>
+                                    (<option key={player.player_id} value={player.player_id}>{"(" + player.player_number + ") " + player.player_name}</option>)
                                 )}
                             </select>
                         </label>
@@ -227,8 +233,8 @@ export default function Court(props: Props) {
                             <select className='border-2 border-gray-400' name='players' id='players'
                                     onChange={changeSelectedBlocker} defaultValue="">
                                 <option value="" disabled>Select</option>
-                                {players.map(player =>
-                                    (<option key={player.player_id} value={player.player_id}>{player.player_name}</option>)
+                                {players.filter(player => player.team_id == oppositeTeamId).map(player =>
+                                    (<option key={player.player_id} value={player.player_id}>{"(" + player.player_number + ") " + player.player_name}</option>)
                                 )}
                             </select>
                         </label>

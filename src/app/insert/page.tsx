@@ -20,7 +20,12 @@ export default function Home()
     
     async function getPlayers()
     {
-        const { data, error } = await supabase.from("Players").select().eq('team_id', 1).returns<Player[]>();
+        if(teamOne == 0 || teamTwo == 0)
+        {
+            return;
+        }
+
+        const { data, error } = await supabase.from("Players").select().in('team_id', [teamOne, teamTwo]).returns<Player[]>();
         if (error)
         {
             console.error(error);
@@ -34,7 +39,8 @@ export default function Home()
 
     useEffect(() => {
         getPlayers();
-    }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [teamOne, teamTwo]);
 
     async function getTeams()
     {
@@ -115,6 +121,8 @@ export default function Home()
     {
         setGameId(existingGameId);
         const game = games.find(game => game.game_id == existingGameId);
+        setTeamOne(game!.team_1);
+        setTeamTwo(game!.team_2);
         const teamOneName = teams.find(team => team.team_id == game?.team_1)?.team_name;
         const teamTwoName = teams.find(team => team.team_id == game?.team_2)?.team_name;
         setGameTitle(teamOneName + " vs " + teamTwoName + " - " + game?.game_date);
@@ -123,6 +131,8 @@ export default function Home()
 
     const resetGameButtonClick = (event: any) =>
     {
+        setTeamOne(0);
+        setTeamTwo(0);
         setGameId(undefined);
         setGameTitle("");
         setGameSet(false);
@@ -170,7 +180,9 @@ export default function Home()
                 onChange={changeExistingGame} defaultValue="">
             <option value="" disabled>Select Game</option>
             {games.map(game =>
-                (<option key={game.game_id} value={game.game_id}>{game.team_1} vs {game.team_2} - {game.game_date}</option>)
+                (<option key={game.game_id} value={game.game_id}>
+                    {teams.find(team => team.team_id == game.team_1)?.team_name} - {teams.find(team => team.team_id == game.team_2)?.team_name} @ {game.game_date}
+                </option>)
             )}
         </select>
     )
@@ -211,7 +223,7 @@ export default function Home()
                             <button className='border-2 border-red-400 w-36' onClick={resetGameButtonClick}>Change Game</button>
                         </div>
                         <div className='my-3'>
-                            <Court players={players} gameId={gameId!}/>
+                            <Court players={players} game={games.find(game => game.game_id == gameId)!}/>
                         </div>
                     </div>
                 )

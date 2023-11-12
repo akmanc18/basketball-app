@@ -1,7 +1,7 @@
 "use client"
 import React, {useEffect, useState} from "react";
 import supabase from "@/util/db";
-import {Game,PlayerTableData, Shot} from "@/util/entities";
+import {Game,OtherPlays,Player,PlayerTableData, Shot} from "@/util/entities";
 
 export default function Stats()
 {
@@ -61,31 +61,47 @@ export default function Stats()
             return;
         }
 
-        const {data, error} = await supabase.from("Players").select("*, Shots(*), Blocks(*), Turnovers(*)")
-                                                                    .eq("Shots.game_id", game.game_id)
-                                                                    .eq("Blocks.game_id", game.game_id)
-                                                                    .eq("Turnovers.game_id", game.game_id);
+        const {data: shotData, error: shotError} = await supabase.from("Shots").select().eq("game_id", game.game_id).returns<Shot[]>();
+        const {data: otherPlaysData, error: otherPlaysError} = await supabase.from("Shots").select().eq("game_id", game.game_id).returns<OtherPlays[]>();
+        const {data: playerData, error: playerError} = await supabase.from("Players").select().in("team_id", [game.team_1, game.team_2]).returns<Player[]>();
 
-        if (error)
+        if (shotError)
         {
-            console.error(error);
+            console.log("Shot error");
+            console.error(shotError);
+            return;
+        }
+        if (otherPlaysError)
+        {
+            console.log("Other plays error");
+            console.error(otherPlaysError);
+            return;
+        }
+        if (playerError)
+        {
+            console.log("Player error");
+            console.error(playerError);
             return;
         }
 
-        if (data)
+        if (shotData && otherPlaysData && playerData)
         {
-            console.log(data);
+            console.log(shotData);
+            console.log("-------------------");
+            console.log(otherPlaysData);
+            console.log("-------------------");
+            console.log(playerData);
 
             const team1DataTable : PlayerTableData[] = [];
             const team2DataTable : PlayerTableData[] = [];
 
-            data.forEach(player => {
+            playerData.forEach(player => {
 
                 const onePointShots : Shot[] = []
                 const twoPointShots : Shot[] = []
                 const threePointShots : Shot[] = []
 
-                player.Shots.forEach(shot => {
+                shotData.filter(shot => shot.player_id == player.player_id).forEach(shot => {
                     switch (shot.point_value) {
                     case 1:
                         onePointShots.push(shot);
@@ -104,9 +120,14 @@ export default function Stats()
                 const data : PlayerTableData = {
                     playerId: player.player_id,
                     playerName: player.player_name,
-                    playerNumber : 0,
-                    blocks: player.Blocks.length,
-                    turnovers: player.Turnovers.length,
+                    playerNumber : player.player_number,
+                    block: shotData.filter(shot => shot.blocker_id == player.player_id).length,
+                    assist: shotData.filter(shot => shot.assister_id == player.player_id).length,
+                    foul: otherPlaysData.filter(play => play.play_type == "Foul" && play.player_id == player.player_id).length,
+                    ballLoss: otherPlaysData.filter(play => play.play_type == "Ball loss" && play.player_id == player.player_id).length,
+                    steal: otherPlaysData.filter(play => play.play_type == "Steal" && play.player_id == player.player_id).length,
+                    turnover: otherPlaysData.filter(play => play.play_type == "Turnover" && play.player_id == player.player_id).length,
+                    rebound: otherPlaysData.filter(play => play.play_type == "Rebound" && play.player_id == player.player_id).length,
                     onePointShot: {
                         attempted: onePointShots.length,
                         successful: onePointShots.filter(shot => shot.shot_result == "hit").length,
@@ -169,7 +190,12 @@ export default function Stats()
                     <th colSpan={3} scope="colgroup">2-pt FG</th>
                     <th colSpan={3} scope="colgroup">3-pt FG</th>
                     <th rowSpan={2}>Blocks</th>
+                    <th rowSpan={2}>Assists</th>
+                    <th rowSpan={2}>Fouls</th>
+                    <th rowSpan={2}>Ball losses</th>
+                    <th rowSpan={2}>Steal</th>
                     <th rowSpan={2}>Turnovers</th>
+                    <th rowSpan={2}>Rebounds</th>
                 </tr>
                 <tr>
                     <th scope="col">1 Pointers att.</th>
@@ -197,8 +223,13 @@ export default function Stats()
                         <td>{playerData.threePointShot.attempted}</td>
                         <td>{playerData.threePointShot.successful}</td>
                         <td>{playerData.threePointShot.percentage}</td>
-                        <td>{playerData.blocks}</td>
-                        <td>{playerData.turnovers}</td>
+                        <td>{playerData.block}</td>
+                        <td>{playerData.assist}</td>
+                        <td>{playerData.foul}</td>
+                        <td>{playerData.ballLoss}</td>
+                        <td>{playerData.steal}</td>
+                        <td>{playerData.turnover}</td>
+                        <td>{playerData.rebound}</td>
                     </tr>
                 ))}
                 </tbody>
