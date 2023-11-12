@@ -32,7 +32,7 @@ export interface Shot
     shot_id: number,
     game_id: number,
     player_id: number,
-    game_timer: string,
+    game_timer: number,
     point_value: number,
     shot_result: string,
     blocker_id: number | null,
@@ -51,7 +51,7 @@ export interface OtherPlays
     game_id: number,
     play_type: string,
     player_id: number,
-    game_timer: string
+    game_timer: number,
     play_coordinates: number[],
 }
 
