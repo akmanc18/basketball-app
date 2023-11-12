@@ -9,52 +9,6 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
-      Blocks: {
-        Row: {
-          block_id: number
-          blocked_shot_id: number
-          game_id: number
-          game_timer: string
-          player_id: number
-        }
-        Insert: {
-          block_id?: number
-          blocked_shot_id: number
-          game_id: number
-          game_timer: string
-          player_id: number
-        }
-        Update: {
-          block_id?: number
-          blocked_shot_id?: number
-          game_id?: number
-          game_timer?: string
-          player_id?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "Blocks_blocked_shot_id_fkey"
-            columns: ["blocked_shot_id"]
-            isOneToOne: false
-            referencedRelation: "Shots"
-            referencedColumns: ["shot_id"]
-          },
-          {
-            foreignKeyName: "Blocks_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "Games"
-            referencedColumns: ["game_id"]
-          },
-          {
-            foreignKeyName: "Blocks_player_id_fkey"
-            columns: ["player_id"]
-            isOneToOne: false
-            referencedRelation: "Players"
-            referencedColumns: ["player_id"]
-          }
-        ]
-      }
       Games: {
         Row: {
           game_date: string
@@ -94,6 +48,45 @@ export interface Database {
             isOneToOne: false
             referencedRelation: "Teams"
             referencedColumns: ["team_id"]
+          }
+        ]
+      }
+      OtherPlays: {
+        Row: {
+          game_id: number
+          game_timer: string
+          play_id: number
+          play_type: string
+          player_id: number
+        }
+        Insert: {
+          game_id: number
+          game_timer: string
+          play_id?: number
+          play_type: string
+          player_id: number
+        }
+        Update: {
+          game_id?: number
+          game_timer?: string
+          play_id?: number
+          play_type?: string
+          player_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "OtherPlays_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "Games"
+            referencedColumns: ["game_id"]
+          },
+          {
+            foreignKeyName: "OtherPlays_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "Players"
+            referencedColumns: ["player_id"]
           }
         ]
       }
@@ -202,42 +195,6 @@ export interface Database {
           team_name?: string
         }
         Relationships: []
-      }
-      Turnovers: {
-        Row: {
-          game_id: number
-          game_timer: string
-          player_id: number
-          turnover_id: number
-        }
-        Insert: {
-          game_id: number
-          game_timer: string
-          player_id: number
-          turnover_id?: number
-        }
-        Update: {
-          game_id?: number
-          game_timer?: string
-          player_id?: number
-          turnover_id?: number
-        }
-        Relationships: [
-          {
-            foreignKeyName: "Turnovers_game_id_fkey"
-            columns: ["game_id"]
-            isOneToOne: false
-            referencedRelation: "Games"
-            referencedColumns: ["game_id"]
-          },
-          {
-            foreignKeyName: "Turnovers_player_id_fkey"
-            columns: ["player_id"]
-            isOneToOne: false
-            referencedRelation: "Players"
-            referencedColumns: ["player_id"]
-          }
-        ]
       }
     }
     Views: {

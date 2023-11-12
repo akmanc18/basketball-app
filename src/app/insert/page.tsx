@@ -10,9 +10,10 @@ export default function Home()
     const [players, setPlayers] = useState<Player[]>([]);
     const [teams, setTeams] = useState<Team[]>([]);
     const [gameDate, setGameDate] = useState<string>("");
-    const [teamOne, setTeamOne] = useState<Team>({ team_id: 0, team_name: "" });
-    const [teamTwo, setTeamTwo] = useState<Team>({ team_id: 0, team_name: "" });
+    const [teamOne, setTeamOne] = useState<number>(0);
+    const [teamTwo, setTeamTwo] = useState<number>(0);
     const [gameCreated, setGameCreated] = useState<boolean>();
+    const [gameId, setGameId] = useState<number>();
     
     async function getPlayers()
     {
@@ -57,14 +58,23 @@ export default function Home()
 
     const createGameButtonClick = async (event: any) => 
     {
-        await supabase.from("Games").insert({
+        const { data, error } = await supabase.from("Games").insert({
             game_date: gameDate!,
             score_team_1: null,
             score_team_2: null,
-            team_1: teamOne!.team_id,
-            team_2: teamTwo!.team_id,
-        })
-        setGameCreated(true);
+            team_1: teamOne,
+            team_2: teamTwo,
+        }).select();
+
+        if(data)
+        {
+            setGameCreated(true);
+            setGameId(data![0].game_id);
+        }
+        if(error)
+        {
+            console.log(error);
+        }
     }
 
     const dateInputLabel = (
@@ -81,8 +91,8 @@ export default function Home()
             Team 1
             <br/>
             <select className='border-2 border-gray-400' name='players' id='players'
-                    onChange={changeTeamOne}>
-                <option key={0} value={0}>Select Team 1</option>
+                    onChange={changeTeamOne} defaultValue="">
+                <option value="" disabled>Select Team 1</option>
                 {teams.map(team =>
                     (<option key={team.team_id} value={team.team_id}>{team.team_name}</option>)
                 )}
@@ -95,8 +105,8 @@ export default function Home()
             Team 2
             <br/>
             <select className='border-2 border-gray-400' name='players' id='players'
-                    onChange={changeTeamTwo}>
-                <option key={0} value={0}>Select Team 2</option>
+                    onChange={changeTeamTwo} defaultValue="">
+                <option value="" disabled>Select Team 2</option>
                 {teams.map(team =>
                     (<option key={team.team_id} value={team.team_id}>{team.team_name}</option>)
                 )}
@@ -113,7 +123,7 @@ export default function Home()
                 {teamOneDropdown}
                 {teamTwoDropdown}
                 {dateInputLabel}
-                {( gameDate != "" && teamOne.team_id != 0 && teamTwo.team_id != 0 ) ? 
+                {( gameDate != "" && teamOne != 0 && teamTwo != 0 && teamOne != teamTwo ) ? 
                 <button className='border-2 border-blue-400 w-36' onClick={createGameButtonClick}>Create Game</button> : 
                 null}
             </div>
@@ -121,7 +131,7 @@ export default function Home()
                 gameCreated &&
                 (
                     <div>
-                        <Court players={players}/>
+                        <Court players={players} gameId={gameId!}/>
                     </div>
                 )
             }
