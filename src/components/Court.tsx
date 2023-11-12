@@ -1,10 +1,9 @@
 "use client"
 
 import supabase from '@/util/db';
-import {Player, PlaysType, Position, ShotResult, Team} from '@/util/entities'
+import {Player, PlaysType, Position, ShotResult} from '@/util/entities'
 import Image from 'next/image'
-import { Input } from 'postcss';
-import React, {useCallback, useState} from 'react'
+import React, { useState} from 'react'
 
 interface Props
 {
@@ -108,7 +107,8 @@ export default function Court(props: Props) {
                 game_id: gameId,
                 game_timer: gameTimer,
                 play_type: playType,
-                player_id: selectedPlayer!
+                player_id: selectedPlayer!,
+                play_coordinates: [teamDot!.xPos, teamDot!.yPos]
             })
             console.log(error);
         }

@@ -36,15 +36,28 @@ export interface Shot
     point_value: number,
     shot_result: string,
     blocker_id: number | null,
-    assister_id: number | null
+    assister_id: number | null,
+    shot_coordinates: number[],
+}
+
+export interface ShotReview extends Shot
+{
+    player: {team_id: number, player_name: string}
 }
 
 export interface OtherPlays
 {
     play_id: number,
     game_id: number,
+    play_type: string,
     player_id: number,
     game_timer: string
+    play_coordinates: number[],
+}
+
+export interface OtherPlaysReview extends OtherPlays
+{
+    player: {team_id: number, player_name: string}
 }
 
 export interface PlayerTableData

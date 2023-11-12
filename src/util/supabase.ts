@@ -55,6 +55,7 @@ export interface Database {
         Row: {
           game_id: number
           game_timer: string
+          play_coordinates: number[]
           play_id: number
           play_type: string
           player_id: number
@@ -62,6 +63,7 @@ export interface Database {
         Insert: {
           game_id: number
           game_timer: string
+          play_coordinates: number[]
           play_id?: number
           play_type: string
           player_id: number
@@ -69,6 +71,7 @@ export interface Database {
         Update: {
           game_id?: number
           game_timer?: string
+          play_coordinates?: number[]
           play_id?: number
           play_type?: string
           player_id?: number
