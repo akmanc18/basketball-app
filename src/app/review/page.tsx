@@ -1,6 +1,6 @@
 "use client"
 import React, {useEffect, useState} from "react";
-import {Game, PlaysType, Team} from "@/util/entities";
+import {Game, Team} from "@/util/entities";
 import supabase from "@/util/db";
 import CourtReview from "@/components/CourtReview";
 
@@ -64,7 +64,7 @@ export default function Review()
                     <select className='border-2 border-gray-400 ml-2' name='game' id='game' defaultValue="" onChange={onGameChange}>
                         <option value="" disabled >Select the game</option>
                         {gameList.map(game =>
-                          (<option key={game.game_id} value={JSON.stringify(game)}>{teamMap.get(game.team_1)!.team_name} - {teamMap.get(game.team_2)!.team_name} @ {game.game_date}</option>)
+                          (<option key={game.game_id} value={JSON.stringify(game)}>{teamMap.get(game.team_1)?.team_name} - {teamMap.get(game.team_2)?.team_name} @ {game.game_date}</option>)
                         )}
                     </select>
                 </label>
