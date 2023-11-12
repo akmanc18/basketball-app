@@ -67,5 +67,7 @@ export interface ShotData
 }
 
 
+// @ts-ignore
 export type ShotResult = "hit" | "missed" | "blocked";
+// @ts-ignore
 export type PlaysType = "Shot" | "Foul" | "Ball loss" | "Steal" | "Turnover" | "Rebound";
