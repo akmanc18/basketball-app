@@ -9,5 +9,5 @@ export function convertToGameTime(gameTime: number) : string
 {
     const minutes = Math.floor(gameTime / 60);
     const seconds = gameTime % 60;
-    return ((minutes != 0) ? minutes : "00") + ":" + ((seconds != 0) ? seconds : "00");
+    return (((minutes - (minutes % 10)) / 10 != 0) ? minutes : "0" + minutes) + ":" + (((seconds - (seconds % 10)) / 10 != 0) ? seconds : "0" + seconds);
 }
