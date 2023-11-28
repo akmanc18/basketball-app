@@ -97,16 +97,19 @@ export interface Database {
         Row: {
           player_id: number
           player_name: string
+          player_number: number
           team_id: number | null
         }
         Insert: {
           player_id?: number
           player_name: string
+          player_number: number
           team_id?: number | null
         }
         Update: {
           player_id?: number
           player_name?: string
+          player_number?: number
           team_id?: number | null
         }
         Relationships: [

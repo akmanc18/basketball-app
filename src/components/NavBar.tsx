@@ -22,6 +22,7 @@ export default function NavBar()
     return (
         <div className="flex flex-col gap-2 bg-zinc-400 padding-container relative z-30 py-5 px-2 lg:px-2">
             <Link href={"/"}>Home</Link>
+            <Link href={"/teaminsert"}>Teams</Link>
             <Link href={sessionValid ? "/insert/" : "/"}>Insert</Link>
             <Link href={"/review/"}>Review</Link>
             <Link href={"/stats/"}>Stats</Link>

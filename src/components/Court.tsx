@@ -28,6 +28,7 @@ export default function Court(props: Props) {
     const [currentTeamId, setCurrentTeamId] = useState<number>();
     const [oppositeTeamId, setOppositeTeamId] = useState<number>();
     const [shotResult, setShotResult] = useState<ShotResult>();
+    const [shotValue, setShotValue] = useState<number>(0);
     const [gameTimer, setGameTimer] = useState<string>("");
     const [currentActionCounter, setCurrentActionCounter] = useState<number>(0);
 
@@ -88,6 +89,7 @@ export default function Court(props: Props) {
         setSelectedBlocker(undefined);
         setSelectedAssister(undefined);
         setShotResult(undefined);
+        setShotValue(0);
     };
 
     const saveButtonClick = async (event:any) =>
@@ -100,6 +102,7 @@ export default function Court(props: Props) {
         setSelectedBlocker(undefined);
         setSelectedAssister(undefined);
         setShotResult(undefined);
+        setShotValue(0);
     };
 
     async function savePlayToDatabase(playType: PlaysType)
@@ -112,7 +115,7 @@ export default function Court(props: Props) {
                 game_id: game.game_id,
                 game_timer: convertFromGameTime(gameTimer!),
                 player_id: selectedPlayer!,
-                point_value: 2,
+                point_value: shotValue,
                 assister_id: selectedAssister == -1 ? null : selectedAssister,
                 shot_result: shotResult!,
                 blocker_id: selectedBlocker,
@@ -148,6 +151,16 @@ export default function Court(props: Props) {
                     )}
                 </select>
             </label>
+        )
+
+        const valueLabel = (
+            <label>
+                Shot Value
+                <br/>
+                <input className='text-center w-20 border-2 border-gray-400' type='text' value={shotValue}
+                        onChange={(event) => setShotValue(Number(event.target.value))}/>
+            </label>
+
         )
 
         const timerLabel = (
@@ -204,6 +217,7 @@ export default function Court(props: Props) {
                                 )}
                             </select>
                         </label>
+                        {valueLabel}
                         {timerLabel}
                     </div>
                     {buttonRender}
@@ -238,6 +252,7 @@ export default function Court(props: Props) {
                                 )}
                             </select>
                         </label>
+                        {valueLabel}
                         {timerLabel}
                     </div>
                     {buttonRender}
@@ -261,6 +276,7 @@ export default function Court(props: Props) {
                                 <option value='blocked'>Blocked</option>
                             </select>
                         </label>
+                        {valueLabel}
                         {timerLabel}
                     </div>
                     {buttonRender}
